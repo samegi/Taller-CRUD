@@ -2,6 +2,8 @@ package com.example.demo.service;
 
 import com.example.demo.model.Creature;
 import com.example.demo.repository.CreatureRepository;
+import com.example.demo.exception.ResourceNotFoundException;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -29,7 +31,7 @@ public class CreatureService {
     // Buscar una criatura por ID
     public Creature getCreatureById(Long id) {
         return creatureRepository.findById(id)
-        .orElseThrow(() -> new RuntimeException("Creature not found"));
+        .orElseThrow(() -> new ResourceNotFoundException("Creature not found"));
     }
 
     // Actualizar una criatura

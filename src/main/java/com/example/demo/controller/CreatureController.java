@@ -20,32 +20,29 @@ public class CreatureController {
         this.creatureService = creatureService;
     }
 
-    // Crear una criatura
+   
     @PostMapping
     public ResponseEntity<Creature> createCreature(@RequestBody Creature creature) {
         Creature newCreature = creatureService.createCreature(creature);
         return ResponseEntity.status(HttpStatus.CREATED).body(newCreature);
     }
 
-    // Obtener todas las criaturas
+   
     @GetMapping
     public List<Creature> getAllCreatures() {
         return creatureService.getAllCreatures();
     }
 
-    // Obtener una criatura por ID
     @GetMapping("/{id}")
     public Creature getCreatureById(@PathVariable Long id) {
         return creatureService.getCreatureById(id);
     }
 
-    // Actualizar criatura
     @PutMapping("/{id}")
     public Creature updateCreature(@PathVariable Long id, @RequestBody Creature updatedCreature) {
         return creatureService.updateCreature(id, updatedCreature);
     }
 
-    // Eliminar criatura
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteCreature(@PathVariable Long id) {
         creatureService.deleteCreature(id);

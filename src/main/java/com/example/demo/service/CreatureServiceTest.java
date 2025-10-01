@@ -1,5 +1,11 @@
-import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.Mockito.*;
+package com.example.demo.service;
+
+import com.example.demo.model.Creature;
+import com.example.demo.repository.CreatureRepository;
+import com.example.demo.exception.ResourceNotFoundException;
+
+import static org.junit.jupiter.api.Assertions.*;  // JUnit 5 assertions
+import static org.mockito.Mockito.*;              // Mockito
 
 import java.util.Optional;
 
@@ -9,7 +15,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 
-public class CreatureServiceTest {
+class CreatureServiceTest {
 
     @Mock
     private CreatureRepository creatureRepository;
