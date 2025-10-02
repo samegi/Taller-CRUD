@@ -6,6 +6,5 @@ import com.example.demo.model.Zone;
 
 public interface ZoneRepository extends JpaRepository<Zone, Long> {
     boolean existsByNameIgnoreCase(String name);
-
 }
 
