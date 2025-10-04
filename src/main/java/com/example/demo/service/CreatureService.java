@@ -18,8 +18,19 @@ public class CreatureService {
         this.creatureRepository = creatureRepository;
     }
 
+    // Validaciones de negocio
+    private void validateCreature(Creature creature) {
+        if (creature.getSize() < 0) {
+            throw new IllegalArgumentException("El tamaño no puede ser menor que 0");
+        }
+        if (creature.getDangerLevel() < 1 || creature.getDangerLevel() > 10) {
+            throw new IllegalArgumentException("El nivel de peligro debe estar entre 1 y 10");
+        }
+    }
+
     // Crear una nueva criatura
     public Creature createCreature(Creature creature) {
+        validateCreature(creature);
         return creatureRepository.save(creature);
     }
 
@@ -30,28 +41,33 @@ public class CreatureService {
 
     // Buscar una criatura por ID
     public Creature getCreatureById(Long id) {
-        return creatureRepository.findById(id)
-        .orElseThrow(() -> new ResourceNotFoundException("Creature not found"));
-    }
+    return creatureRepository.findById(id)
+        .orElseThrow(() -> new ResourceNotFoundException("Criatura no encontrada con id: " + id));
+}
 
     // Actualizar una criatura
     public Creature updateCreature(Long id, Creature updatedCreature) {
+        // 🔹 Primero verificar si existe
         Creature creature = getCreatureById(id);
+        // 🔹 Luego validar datos
+        validateCreature(updatedCreature);
+
         creature.setName(updatedCreature.getName());
         creature.setSpecies(updatedCreature.getSpecies());
         creature.setSize(updatedCreature.getSize());
         creature.setDangerLevel(updatedCreature.getDangerLevel());
         creature.setHealthStatus(updatedCreature.getHealthStatus());
+
         return creatureRepository.save(creature);
     }
 
     // Eliminar una criatura
     public void deleteCreature(Long id) {
         Creature creature = getCreatureById(id);
-        if (!"critical".equals(creature.getHealthStatus())) {
+        if (!"critical".equalsIgnoreCase(creature.getHealthStatus())) {
             creatureRepository.delete(creature);
-        }else{
-		throw new IllegalStateException("Cannot delete a creature in critical health");
-}    
-}
+        } else {
+            throw new IllegalArgumentException("No se puede eliminar una criatura con estado crítico");
+        }
+    }
 }
