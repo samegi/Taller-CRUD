@@ -23,35 +23,100 @@ class CreatureServiceTest {
     @InjectMocks
     private CreatureService creatureService;
 
+    private Creature creature;
+
     @BeforeEach
     void setUp() {
         MockitoAnnotations.openMocks(this);
+
+        creature = new Creature();
+        creature.setId(1L);
+        creature.setName("Dragon");
+        creature.setSpecies("Reptile");
+        creature.setSize(10);
+        creature.setDangerLevel(7);
+        creature.setHealthStatus("stable");
     }
 
     @Test
-    void testGetCreatureById_ShouldReturnCreature_WhenCreatureExists() {
-        Long creatureId = 1L;
-        Creature expectedCreature = new Creature();
-        expectedCreature.setId(creatureId);
+    void testCreateCreature_Success() {
+        when(creatureRepository.save(any(Creature.class))).thenReturn(creature);
 
-        when(creatureRepository.findById(creatureId)).thenReturn(Optional.of(expectedCreature));
+        Creature saved = creatureService.createCreature(creature);
 
-        Creature actualCreature = creatureService.getCreatureById(creatureId);
-
-        assertNotNull(actualCreature);
-        assertEquals(expectedCreature, actualCreature);
-        verify(creatureRepository, times(1)).findById(creatureId);
+        assertNotNull(saved);
+        assertEquals("Dragon", saved.getName());
+        verify(creatureRepository, times(1)).save(creature);
     }
 
     @Test
-    void testGetCreatureById_ShouldThrowException_WhenCreatureDoesNotExist() {
-        Long creatureId = 2L;
-        when(creatureRepository.findById(creatureId)).thenReturn(Optional.empty());
-
-        assertThrows(ResourceNotFoundException.class,
-            () -> creatureService.getCreatureById(creatureId));
-
-        verify(creatureRepository, times(1)).findById(creatureId);
+    void testCreateCreature_InvalidDangerLevel_ThrowsException() {
+        creature.setDangerLevel(15);
+        assertThrows(IllegalArgumentException.class, () -> creatureService.createCreature(creature));
+        verify(creatureRepository, never()).save(any());
     }
 
+    @Test
+    void testGetCreatureById_Found() {
+        when(creatureRepository.findById(1L)).thenReturn(Optional.of(creature));
+
+        Creature found = creatureService.getCreatureById(1L);
+
+        assertEquals("Dragon", found.getName());
+        verify(creatureRepository, times(1)).findById(1L);
+    }
+
+    @Test
+    void testGetCreatureById_NotFound() {
+        when(creatureRepository.findById(99L)).thenReturn(Optional.empty());
+        assertThrows(ResourceNotFoundException.class, () -> creatureService.getCreatureById(99L));
+    }
+
+    @Test
+    void testUpdateCreature_Success() {
+        Creature updated = new Creature();
+        updated.setName("Phoenix");
+        updated.setSpecies("Bird");
+        updated.setSize(8);
+        updated.setDangerLevel(5);
+        updated.setHealthStatus("healthy");
+
+        when(creatureRepository.findById(1L)).thenReturn(Optional.of(creature));
+        when(creatureRepository.save(any(Creature.class))).thenReturn(updated);
+
+        Creature result = creatureService.updateCreature(1L, updated);
+
+        assertEquals("Phoenix", result.getName());
+        assertEquals(5, result.getDangerLevel());
+        verify(creatureRepository, times(1)).save(any(Creature.class));
+    }
+
+    @Test
+    void testUpdateCreature_InvalidSize_ThrowsException() {
+        Creature updated = new Creature();
+        updated.setSize(-3);
+
+        when(creatureRepository.findById(1L)).thenReturn(Optional.of(creature));
+
+        assertThrows(IllegalArgumentException.class, () -> creatureService.updateCreature(1L, updated));
+        verify(creatureRepository, never()).save(any());
+    }
+
+    @Test
+    void testDeleteCreature_Success() {
+        when(creatureRepository.findById(1L)).thenReturn(Optional.of(creature));
+
+        creatureService.deleteCreature(1L);
+
+        verify(creatureRepository, times(1)).delete(creature);
+    }
+
+    @Test
+    void testDeleteCreature_CriticalHealth_ThrowsException() {
+        creature.setHealthStatus("critical");
+        when(creatureRepository.findById(1L)).thenReturn(Optional.of(creature));
+
+        assertThrows(IllegalArgumentException.class, () -> creatureService.deleteCreature(1L));
+        verify(creatureRepository, never()).delete(any());
+    }
 }
