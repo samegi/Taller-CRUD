@@ -1,7 +1,8 @@
-package com.example.demo.service;
+package com.example.demo.unit;
 
 import com.example.demo.model.Creature;
 import com.example.demo.repository.CreatureRepository;
+import com.example.demo.service.CreatureService;
 import com.example.demo.exception.ResourceNotFoundException;
 
 import static org.junit.jupiter.api.Assertions.*;  // JUnit 5 assertions

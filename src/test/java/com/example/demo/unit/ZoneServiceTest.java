@@ -1,7 +1,8 @@
-package com.example.demo.service;
+package com.example.demo.unit;
 
 import com.example.demo.model.Zone;
 import com.example.demo.repository.ZoneRepository;
+import com.example.demo.service.ZoneService;
 import com.example.demo.repository.CreatureRepository;
 
 import org.junit.jupiter.api.BeforeEach;
