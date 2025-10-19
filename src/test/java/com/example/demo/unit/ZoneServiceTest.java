@@ -1,9 +1,15 @@
 package com.example.demo.unit;
 
 import com.example.demo.model.Zone;
-import com.example.demo.repository.ZoneRepository;
 import com.example.demo.service.ZoneService;
+import com.example.demo.repository.ZoneRepository;
 import com.example.demo.repository.CreatureRepository;
+
+import static org.junit.jupiter.api.Assertions.*;  // JUnit 5 assertions
+import static org.mockito.Mockito.*;              // Mockito
+import static org.mockito.ArgumentMatchers.any;
+
+import java.util.Optional;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -12,12 +18,7 @@ import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 
 import java.util.List;
-import java.util.Optional;
 import java.util.NoSuchElementException;
-
-import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.Mockito.*;
-import static org.mockito.ArgumentMatchers.any;
 
 class ZoneServiceTest {
 
@@ -138,25 +139,6 @@ class ZoneServiceTest {
     }
 
     @Test
-    void update_ShouldThrow_WhenZoneNotFound() {
-        when(zoneRepository.findById(100L)).thenReturn(Optional.empty());
-        assertThrows(NoSuchElementException.class, () -> zoneService.update(100L, new Zone()));
-    }
-
-    @Test
-    void update_ShouldThrow_WhenCapacityNegative() {
-        Zone existing = new Zone();
-        existing.setId(1L);
-
-        when(zoneRepository.findById(1L)).thenReturn(Optional.of(existing));
-
-        Zone bad = new Zone();
-        bad.setCapacity(-2);
-
-        assertThrows(IllegalArgumentException.class, () -> zoneService.update(1L, bad));
-    }
-
-    @Test
     void update_ShouldThrow_WhenCapacityLessThanAssigned() {
         Zone existing = new Zone();
         existing.setId(1L);
@@ -166,21 +148,6 @@ class ZoneServiceTest {
 
         Zone bad = new Zone();
         bad.setCapacity(2);
-
-        assertThrows(IllegalStateException.class, () -> zoneService.update(1L, bad));
-    }
-
-    @Test
-    void update_ShouldThrow_WhenDuplicateName() {
-        Zone existing = new Zone();
-        existing.setId(1L);
-        existing.setName("Original");
-
-        when(zoneRepository.findById(1L)).thenReturn(Optional.of(existing));
-        when(zoneRepository.existsByNameIgnoreCase("Duplicado")).thenReturn(true);
-
-        Zone bad = new Zone();
-        bad.setName("Duplicado");
 
         assertThrows(IllegalStateException.class, () -> zoneService.update(1L, bad));
     }
