@@ -1,0 +1,97 @@
+{
+  "info": {
+    "name": "CRUD Zones",
+    "_postman_id": "aabbccdd-eeff-1122-3344-556677889900",
+    "description": "Colección para probar el CRUD de zonas del zoológico. Primero usar POST, luego los demás métodos.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "item": [
+    {
+      "name": "POST - Crear Zona",
+      "request": {
+        "method": "POST",
+        "header": [
+          { "key": "Content-Type", "value": "application/json" }
+        ],
+        "url": {
+          "raw": "{{baseUrl}}{{apiBase}}",
+          "host": [ "{{baseUrl}}" ],
+          "path": [ "{{apiBase}}" ]
+        },
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"nombre\": \"Zona Tropical\",\n  \"descripcion\": \"Hábitat cálido con especies exóticas\",\n  \"capacidad\": 20\n}"
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test(\"Status es 200 o 201\", () => pm.expect([200,201]).to.include(pm.response.code));",
+              "const json = pm.response.json();",
+              "if (json && json.id) pm.collectionVariables.set(\"zoneId\", json.id);"
+            ],
+            "type": "text/javascript"
+          }
+        }
+      ]
+    },
+    {
+      "name": "GET - Lista de Zonas",
+      "request": {
+        "method": "GET",
+        "url": {
+          "raw": "{{baseUrl}}{{apiBase}}",
+          "host": [ "{{baseUrl}}" ],
+          "path": [ "{{apiBase}}" ]
+        }
+      }
+    },
+    {
+      "name": "GET - Zona por ID",
+      "request": {
+        "method": "GET",
+        "url": {
+          "raw": "{{baseUrl}}{{apiBase}}/{{zoneId}}",
+          "host": [ "{{baseUrl}}" ],
+          "path": [ "{{apiBase}}", "{{zoneId}}" ]
+        }
+      }
+    },
+    {
+      "name": "PUT - Actualizar Zona",
+      "request": {
+        "method": "PUT",
+        "header": [
+          { "key": "Content-Type", "value": "application/json" }
+        ],
+        "url": {
+          "raw": "{{baseUrl}}{{apiBase}}/{{zoneId}}",
+          "host": [ "{{baseUrl}}" ],
+          "path": [ "{{apiBase}}", "{{zoneId}}" ]
+        },
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"nombre\": \"Zona Tropical Renovada\",\n  \"descripcion\": \"Área expandida con nuevas especies tropicales\",\n  \"capacidad\": 25\n}"
+        }
+      }
+    },
+    {
+      "name": "DELETE - Eliminar Zona",
+      "request": {
+        "method": "DELETE",
+        "url": {
+          "raw": "{{baseUrl}}{{apiBase}}/{{zoneId}}",
+          "host": [ "{{baseUrl}}" ],
+          "path": [ "{{apiBase}}", "{{zoneId}}" ]
+        }
+      }
+    }
+  ],
+  "variable": [
+    { "key": "baseUrl", "value": "http://localhost:8080", "type": "string" },
+    { "key": "apiBase", "value": "/api/zones", "type": "string" },
+    { "key": "zoneId", "value": "", "type": "string" }
+  ]
+}
