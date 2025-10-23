@@ -11,16 +11,23 @@
       "request": {
         "method": "POST",
         "header": [
-          { "key": "Content-Type", "value": "application/json" }
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
         ],
         "url": {
           "raw": "{{baseUrl}}{{apiBase}}",
-          "host": [ "{{baseUrl}}" ],
-          "path": [ "{{apiBase}}" ]
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "{{apiBase}}"
+          ]
         },
         "body": {
           "mode": "raw",
-          "raw": "{\n  \"nombre\": \"Grifo Dorado\",\n  \"tipo\": \"Ave mítica\",\n  \"nivelPoder\": 88,\n  \"estado\": \"Normal\"\n}"
+          "raw": "{\n  \"nombre\": \"Grifo Dorado {{unique}}\",\n  \"tipo\": \"Ave mítica\",\n  \"nivelPoder\": 88,\n  \"estado\": \"Normal\"\n}"
         }
       },
       "event": [
@@ -29,8 +36,30 @@
           "script": {
             "exec": [
               "pm.test(\"Status es 200 o 201\", () => pm.expect([200,201]).to.include(pm.response.code));",
-              "const json = pm.response.json();",
-              "if (json && json.id) pm.collectionVariables.set(\"creatureId\", json.id);"
+              "let json = {};",
+              "try { json = pm.response.json(); } catch(e) {}",
+              "let id = json?.id || json?.data?.id;",
+              "// intenta desde Location si no viene en el body",
+              "if (!id) {",
+              "  const loc = pm.response.headers.get(\"Location\");",
+              "  id = loc?.match(/\\/(\\d+)(?:\\?.*)?$/)?.[1];",
+              "}",
+              "pm.expect(id, \"La respuesta no entregó id\").to.exist;",
+              "const path = pm.request.url.path.join(\"/\");",
+              "if (path.includes(\"zones\")) {",
+              "  pm.collectionVariables.set(\"zoneId\", id);",
+              "} else if (path.includes(\"creatures\")) {",
+              "  pm.collectionVariables.set(\"creatureId\", id);",
+              "}"
+            ],
+            "type": "text/javascript"
+          }
+        },
+        {
+          "listen": "prerequest",
+          "script": {
+            "exec": [
+              "pm.collectionVariables.set(\"unique\", Date.now());"
             ],
             "type": "text/javascript"
           }
@@ -43,8 +72,12 @@
         "method": "GET",
         "url": {
           "raw": "{{baseUrl}}{{apiBase}}",
-          "host": [ "{{baseUrl}}" ],
-          "path": [ "{{apiBase}}" ]
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "{{apiBase}}"
+          ]
         }
       }
     },
@@ -54,8 +87,13 @@
         "method": "GET",
         "url": {
           "raw": "{{baseUrl}}{{apiBase}}/{{creatureId}}",
-          "host": [ "{{baseUrl}}" ],
-          "path": [ "{{apiBase}}", "{{creatureId}}" ]
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "{{apiBase}}",
+            "{{creatureId}}"
+          ]
         }
       }
     },
@@ -64,12 +102,20 @@
       "request": {
         "method": "PUT",
         "header": [
-          { "key": "Content-Type", "value": "application/json" }
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
         ],
         "url": {
           "raw": "{{baseUrl}}{{apiBase}}/{{creatureId}}",
-          "host": [ "{{baseUrl}}" ],
-          "path": [ "{{apiBase}}", "{{creatureId}}" ]
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "{{apiBase}}",
+            "{{creatureId}}"
+          ]
         },
         "body": {
           "mode": "raw",
@@ -83,15 +129,49 @@
         "method": "DELETE",
         "url": {
           "raw": "{{baseUrl}}{{apiBase}}/{{creatureId}}",
-          "host": [ "{{baseUrl}}" ],
-          "path": [ "{{apiBase}}", "{{creatureId}}" ]
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "{{apiBase}}",
+            "{{creatureId}}"
+          ]
         }
-      }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test(\"DELETE ok (200/204)\", () => pm.expect([200,204]).to.include(pm.response.code));",
+              "const path = pm.request.url.path.join(\"/\");",
+              "if (path.includes(\"zones\")) {",
+              "  pm.collectionVariables.unset(\"zoneId\");",
+              "} else if (path.includes(\"creatures\")) {",
+              "  pm.collectionVariables.unset(\"creatureId\");",
+              "}"
+            ],
+            "type": "text/javascript"
+          }
+        }
+      ]
     }
   ],
   "variable": [
-    { "key": "baseUrl", "value": "http://localhost:8080", "type": "string" },
-    { "key": "apiBase", "value": "/api/creatures", "type": "string" },
-    { "key": "creatureId", "value": "", "type": "string" }
+    {
+      "key": "baseUrl",
+      "value": "http://localhost:8080",
+      "type": "string"
+    },
+    {
+      "key": "apiBase",
+      "value": "/api/creatures",
+      "type": "string"
+    },
+    {
+      "key": "creatureId",
+      "value": "",
+      "type": "string"
+    }
   ]
 }
