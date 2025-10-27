@@ -1,0 +1,199 @@
+{
+	"info": {
+		"_postman_id": "8cdbf088-7b9f-428c-858e-2aeff46743ca",
+		"name": "CRUD Zones",
+		"description": "Colección para probar el CRUD de zonas del zoológico. Primero usar POST, luego los demás métodos.",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "49391629",
+		"_collection_link": "https://numa13cata-9639665.postman.co/workspace/Catalina-'s-Workspace~9b998fff-5d94-44a8-81fa-36c053f58920/collection/49391629-8cdbf088-7b9f-428c-858e-2aeff46743ca?action=share&source=collection_link&creator=49391629"
+	},
+	"item": [
+		{
+			"name": "POST - Crear Zona",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"",
+							"/* pm.test(\"Status es 200 o 201\", () => pm.expect([200,201]).to.include(pm.response.code));",
+							"let json = {};",
+							"try { json = pm.response.json(); } catch(e) {}",
+							"let id = json?.id || json?.data?.id;",
+							"// intenta desde Location si no viene en el body",
+							"if (!id) {",
+							"  const loc = pm.response.headers.get(\"Location\");",
+							"  id = loc?.match(/\\/(\\d+)(?:\\?.*)?$/)?.[1];",
+							"}",
+							"pm.expect(id, \"La respuesta no entregó id\").to.exist;",
+							"const path = pm.request.url.path.join(\"/\");",
+							"if (path.includes(\"zones\")) {",
+							"  pm.collectionVariables.set(\"zoneId\", id);",
+							"} else if (path.includes(\"creatures\")) {",
+							"  pm.collectionVariables.set(\"creatureId\", id);",
+							"}",
+							"*/",
+							"pm.test(\"Zone created successfully\", function () {",
+							"    pm.response.to.have.status(201); // el servidor debe responder 201",
+							"    const jsonData = pm.response.json();",
+							"    pm.expect(jsonData).to.have.property(\"id\");",
+							"    pm.expect(jsonData.name).to.eql(\"Zona Urbana\"); // usa el nombre nuevo que pongas",
+							"});"
+						],
+						"type": "text/javascript",
+						"packages": {},
+						"requests": {}
+					}
+				},
+				{
+					"listen": "prerequest",
+					"script": {
+						"exec": [
+							"pm.collectionVariables.set(\"unique\", Date.now());"
+						],
+						"type": "text/javascript",
+						"packages": {},
+						"requests": {}
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n  \"name\": \"Zona Urbana\",\n  \"description\": \"Ciudad Capital\",\n  \"capacity\": 80\n}"
+				},
+				"url": {
+					"raw": "http://localhost:8080/api/zones",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"api",
+						"zones"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "GET - Lista de Zonas",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{baseUrl}}/{{apiBase}}",
+					"host": [
+						"{{baseUrl}}"
+					],
+					"path": [
+						"{{apiBase}}"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "GET - Zona por ID",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{baseUrl}}/{{apiBase}}/{{zoneId}}",
+					"host": [
+						"{{baseUrl}}"
+					],
+					"path": [
+						"{{apiBase}}",
+						"{{zoneId}}"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "PUT - Actualizar Zona",
+			"request": {
+				"method": "PUT",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n  \"nombre\": \"Zona Tropical Renovada\",\n  \"descripcion\": \"Área expandida con nuevas especies tropicales\",\n  \"capacidad\": 25\n}"
+				},
+				"url": {
+					"raw": "{{baseUrl}}/{{apiBase}}/{{zoneId}}",
+					"host": [
+						"{{baseUrl}}"
+					],
+					"path": [
+						"{{apiBase}}",
+						"{{zoneId}}"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "DELETE - Eliminar Zona",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Zone deleted successfully\", function () {",
+							"    pm.response.to.have.status(204); // el servidor debe responder 201",
+							"});"
+						],
+						"type": "text/javascript",
+						"packages": {},
+						"requests": {}
+					}
+				}
+			],
+			"request": {
+				"method": "DELETE",
+				"header": [],
+				"url": {
+					"raw": "{{baseUrl}}/{{apiBase}}/2",
+					"host": [
+						"{{baseUrl}}"
+					],
+					"path": [
+						"{{apiBase}}",
+						"2"
+					]
+				}
+			},
+			"response": []
+		}
+	],
+	"variable": [
+		{
+			"key": "baseUrl",
+			"value": "http://localhost:8080",
+			"type": "string"
+		},
+		{
+			"key": "apiBase",
+			"value": "/api/zones",
+			"type": "string"
+		},
+		{
+			"key": "unique",
+			"value": ""
+		}
+	]
+}
