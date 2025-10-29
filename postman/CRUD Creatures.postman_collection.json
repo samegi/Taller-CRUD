@@ -1,0 +1,461 @@
+{
+	"info": {
+		"_postman_id": "ebeea747-7169-4680-b1cd-6999689bf9d8",
+		"name": "CRUD Creatures",
+		"description": "Colección para probar el CRUD de criaturas. Primero usar POST, luego los otros métodos.",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "49391629",
+		"_collection_link": "https://numa13cata-9639665.postman.co/workspace/Catalina-'s-Workspace~9b998fff-5d94-44a8-81fa-36c053f58920/collection/49391629-ebeea747-7169-4680-b1cd-6999689bf9d8?action=share&source=collection_link&creator=49391629"
+	},
+	"item": [
+		{
+			"name": "POST - Crear Criatura",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status es 200 o 201\", () => pm.expect([200,201]).to.include(pm.response.code));",
+							"let json = {};",
+							"try { json = pm.response.json(); } catch(e) {}",
+							"let id = json?.id || json?.data?.id;",
+							"// intenta desde Location si no viene en el body",
+							"if (!id) {",
+							"  const loc = pm.response.headers.get(\"Location\");",
+							"  id = loc?.match(/\\/(\\d+)(?:\\?.*)?$/)?.[1];",
+							"}",
+							"pm.expect(id, \"La respuesta no entregó id\").to.exist;",
+							"const path = pm.request.url.path.join(\"/\");",
+							"if (path.includes(\"zones\")) {",
+							"  pm.collectionVariables.set(\"zoneId\", id);",
+							"} else if (path.includes(\"creatures\")) {",
+							"  pm.collectionVariables.set(\"creatureId\", id);",
+							"}"
+						],
+						"type": "text/javascript",
+						"packages": {},
+						"requests": {}
+					}
+				},
+				{
+					"listen": "prerequest",
+					"script": {
+						"exec": [
+							"pm.collectionVariables.set(\"unique\", Date.now());"
+						],
+						"type": "text/javascript",
+						"packages": {},
+						"requests": {}
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n  \"nombre\": \"Grifo Dorado {{unique}}\",\n  \"tipo\": \"Ave mítica\",\n  \"nivelPoder\": 88,\n  \"estado\": \"Normal\"\n}"
+				},
+				"url": {
+					"raw": "{{baseUrl}}/{{apiBase}}",
+					"host": [
+						"{{baseUrl}}"
+					],
+					"path": [
+						"{{apiBase}}"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "POST - Crear Criatura Chaining",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"/*pm.test(\"Status es 200 o 201\", () => pm.expect([200,201]).to.include(pm.response.code));",
+							"let json = {};",
+							"try { json = pm.response.json(); } catch(e) {}",
+							"let id = json?.id || json?.data?.id;",
+							"// intenta desde Location si no viene en el body",
+							"if (!id) {",
+							"  const loc = pm.response.headers.get(\"Location\");",
+							"  id = loc?.match(/\\/(\\d+)(?:\\?.*)?$/)?.[1];",
+							"}",
+							"pm.expect(id, \"La respuesta no entregó id\").to.exist;",
+							"const path = pm.request.url.path.join(\"/\");",
+							"if (path.includes(\"zones\")) {",
+							"  pm.collectionVariables.set(\"zoneId\", id);",
+							"} else if (path.includes(\"creatures\")) {",
+							"  pm.collectionVariables.set(\"creatureId\", id);",
+							"}",
+							"*/",
+							"",
+							"pm.test(\"Creature created successfully\", function () {",
+							"    pm.response.to.have.status(201);",
+							"    const jsonData = pm.response.json();",
+							"",
+							"    // Guardar el ID de la criatura creada",
+							"    pm.environment.set(\"creatureId\", jsonData.id);",
+							"    console.log(\"ID del Tigre del Norte guardado:\", jsonData.id);",
+							"});"
+						],
+						"type": "text/javascript",
+						"packages": {},
+						"requests": {}
+					}
+				},
+				{
+					"listen": "prerequest",
+					"script": {
+						"exec": [
+							"pm.collectionVariables.set(\"unique\", Date.now());"
+						],
+						"type": "text/javascript",
+						"packages": {},
+						"requests": {}
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n  \"name\": \"Tigre del Norte\",\n  \"species\": \"Felino gigante\",\n  \"size\": 3.1,\n  \"dangerLevel\": 4,\n  \"healthStatus\": \"Saludable\",\n  \"zoneId\": 2\n}"
+				},
+				"url": {
+					"raw": "http://localhost:8080/api/creatures",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"api",
+						"creatures"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "GET - Lista de Criaturas",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Creature list retrieved successfully\", function () {\r",
+							"    pm.response.to.have.status(200); // Código 200 indica éxito\r",
+							"    const jsonData = pm.response.json();\r",
+							"    pm.expect(jsonData).to.be.an(\"array\"); // Debe retornar una lista\r",
+							"    pm.expect(jsonData.length).to.be.above(0); // Debe haber al menos una criatura\r",
+							"});"
+						],
+						"type": "text/javascript",
+						"packages": {},
+						"requests": {}
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:8080/api/creatures",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"api",
+						"creatures"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "GET - Criatura por ID",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Creature retrieved successfully\", function () {\r",
+							"    pm.response.to.have.status(200); \r",
+							"    const jsonData = pm.response.json();\r",
+							"\r",
+							" \r",
+							"    pm.expect(jsonData).to.have.property(\"id\");\r",
+							"    pm.expect(jsonData.id).to.eql(2);\r",
+							"    pm.expect(jsonData.name).to.eql(\"Serpiente de Fuego\");\r",
+							"    pm.expect(jsonData.species).to.eql(\"Serpiente exótica\");\r",
+							"});"
+						],
+						"type": "text/javascript",
+						"packages": {},
+						"requests": {}
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:8080/api/creatures/2",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"api",
+						"creatures",
+						"2"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "GET - Criatura por ID Chaining",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Creature retrieved successfully\", function () {\r",
+							"    pm.response.to.have.status(200);\r",
+							"    const jsonData = pm.response.json();\r",
+							"    pm.expect(jsonData.name).to.eql(\"Tigre del Norte\");\r",
+							"});"
+						],
+						"type": "text/javascript",
+						"packages": {},
+						"requests": {}
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:8080/api/creatures/{{creatureId}}",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"api",
+						"creatures",
+						"{{creatureId}}"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "PUT - Actualizar Criatura",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Creature updated successfully\", function () {\r",
+							"    pm.response.to.have.status(200); \r",
+							"    const jsonData = pm.response.json();\r",
+							"\r",
+							"    pm.expect(jsonData).to.have.property(\"id\");\r",
+							"    pm.expect(jsonData.id).to.eql(2);\r",
+							"    pm.expect(jsonData.dangerLevel).to.eql(5);\r",
+							"    pm.expect(jsonData.healthStatus).to.eql(\"Saludable\");\r",
+							"});"
+						],
+						"type": "text/javascript",
+						"packages": {},
+						"requests": {}
+					}
+				}
+			],
+			"request": {
+				"method": "PUT",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n  \"name\": \"Serpiente de Fuego\",\n  \"species\": \"Serpiente exótica\",\n  \"size\": 2.5,\n  \"dangerLevel\": 5,\n  \"healthStatus\": \"Saludable\",\n  \"zoneId\": 1\n}"
+				},
+				"url": {
+					"raw": "http://localhost:8080/api/creatures/2",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"api",
+						"creatures",
+						"2"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "PUT - Actualizar Criatura Chaining",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Creature updated successfully\", function () {\r",
+							"    pm.response.to.have.status(200);\r",
+							"    const jsonData = pm.response.json();\r",
+							"    pm.expect(jsonData.dangerLevel).to.eql(5);\r",
+							"});\r",
+							""
+						],
+						"type": "text/javascript",
+						"packages": {},
+						"requests": {}
+					}
+				}
+			],
+			"request": {
+				"method": "PUT",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n  \"name\": \"Tigre del Norte\",\n  \"species\": \"Felino gigante\",\n  \"size\": 3.4,\n  \"dangerLevel\": 5,\n  \"healthStatus\": \"Excelente\",\n  \"zoneId\": 2\n}"
+				},
+				"url": {
+					"raw": "http://localhost:8080/api/creatures/{{creatureId}}",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"api",
+						"creatures",
+						"{{creatureId}}"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "DELETE - Eliminar Criatura",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Creature deleted successfully\", function () {",
+							"    pm.response.to.have.status(204); ",
+							"});"
+						],
+						"type": "text/javascript",
+						"packages": {},
+						"requests": {}
+					}
+				}
+			],
+			"request": {
+				"method": "DELETE",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:8080/api/creatures/2",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"api",
+						"creatures",
+						"2"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "DELETE - Eliminar Criatura Chaining",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Creature deleted successfully\", function () {",
+							"    pm.response.to.have.status(204); ",
+							"});"
+						],
+						"type": "text/javascript",
+						"packages": {},
+						"requests": {}
+					}
+				}
+			],
+			"request": {
+				"method": "DELETE",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:8080/api/creatures/{{creatureId}}",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"api",
+						"creatures",
+						"{{creatureId}}"
+					]
+				}
+			},
+			"response": []
+		}
+	],
+	"variable": [
+		{
+			"key": "baseUrl",
+			"value": "http://localhost:8080",
+			"type": "string"
+		},
+		{
+			"key": "apiBase",
+			"value": "/api/creatures",
+			"type": "string"
+		},
+		{
+			"key": "unique",
+			"value": ""
+		}
+	]
+}
