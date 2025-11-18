@@ -1,0 +1,177 @@
+{
+	"id": "f7092996-9743-4d7b-b182-8b6bca2763c6",
+	"name": "CRUD Creatures",
+	"timestamp": "2025-10-29T00:54:35.514Z",
+	"collection_id": "49391629-ebeea747-7169-4680-b1cd-6999689bf9d8",
+	"folder_id": 0,
+	"environment_id": "49391629-233359a8-8f2c-450c-ab33-115412311049",
+	"totalPass": 5,
+	"delay": 0,
+	"persist": true,
+	"status": "finished",
+	"startedAt": "2025-10-29T00:54:34.435Z",
+	"totalFail": 0,
+	"results": [
+		{
+			"id": "895ae3f4-bf4b-4537-a15f-6f0d658c49c9",
+			"name": "POST - Crear Criatura Chaining",
+			"url": "http://localhost:8080/api/creatures",
+			"time": 15,
+			"responseCode": {
+				"code": 201,
+				"name": "Created"
+			},
+			"tests": {
+				"Creature created successfully": true
+			},
+			"testPassFailCounts": {
+				"Creature created successfully": {
+					"pass": 1,
+					"fail": 0
+				}
+			},
+			"times": [
+				15
+			],
+			"allTests": [
+				{
+					"Creature created successfully": true
+				}
+			]
+		},
+		{
+			"id": "f9653b00-dab7-40f1-9987-28b279a366e8",
+			"name": "GET - Lista de Criaturas",
+			"url": "http://localhost:8080/api/creatures",
+			"time": 172,
+			"responseCode": {
+				"code": 200,
+				"name": "OK"
+			},
+			"tests": {
+				"Creature list retrieved successfully": true
+			},
+			"testPassFailCounts": {
+				"Creature list retrieved successfully": {
+					"pass": 1,
+					"fail": 0
+				}
+			},
+			"times": [
+				172
+			],
+			"allTests": [
+				{
+					"Creature list retrieved successfully": true
+				}
+			]
+		},
+		{
+			"id": "1ec9ad83-044b-4605-bba8-ff46d83d6cce",
+			"name": "GET - Criatura por ID Chaining",
+			"url": "http://localhost:8080/api/creatures/9",
+			"time": 44,
+			"responseCode": {
+				"code": 200,
+				"name": "OK"
+			},
+			"tests": {
+				"Creature retrieved successfully": true
+			},
+			"testPassFailCounts": {
+				"Creature retrieved successfully": {
+					"pass": 1,
+					"fail": 0
+				}
+			},
+			"times": [
+				44
+			],
+			"allTests": [
+				{
+					"Creature retrieved successfully": true
+				}
+			]
+		},
+		{
+			"id": "035dbfae-ecf1-4464-9521-5bfc7dbb57ba",
+			"name": "PUT - Actualizar Criatura Chaining",
+			"url": "http://localhost:8080/api/creatures/9",
+			"time": 26,
+			"responseCode": {
+				"code": 200,
+				"name": "OK"
+			},
+			"tests": {
+				"Creature updated successfully": true
+			},
+			"testPassFailCounts": {
+				"Creature updated successfully": {
+					"pass": 1,
+					"fail": 0
+				}
+			},
+			"times": [
+				26
+			],
+			"allTests": [
+				{
+					"Creature updated successfully": true
+				}
+			]
+		},
+		{
+			"id": "ceedd4f4-9b09-4d40-b31b-71e5e4687e60",
+			"name": "DELETE - Eliminar Criatura Chaining",
+			"url": "http://localhost:8080/api/creatures/9",
+			"time": 26,
+			"responseCode": {
+				"code": 204,
+				"name": "No Content"
+			},
+			"tests": {
+				"Creature deleted successfully": true
+			},
+			"testPassFailCounts": {
+				"Creature deleted successfully": {
+					"pass": 1,
+					"fail": 0
+				}
+			},
+			"times": [
+				26
+			],
+			"allTests": [
+				{
+					"Creature deleted successfully": true
+				}
+			]
+		}
+	],
+	"count": 1,
+	"totalTime": 283,
+	"collection": {
+		"requests": [
+			{
+				"id": "895ae3f4-bf4b-4537-a15f-6f0d658c49c9",
+				"method": "POST"
+			},
+			{
+				"id": "f9653b00-dab7-40f1-9987-28b279a366e8",
+				"method": "GET"
+			},
+			{
+				"id": "1ec9ad83-044b-4605-bba8-ff46d83d6cce",
+				"method": "GET"
+			},
+			{
+				"id": "035dbfae-ecf1-4464-9521-5bfc7dbb57ba",
+				"method": "PUT"
+			},
+			{
+				"id": "ceedd4f4-9b09-4d40-b31b-71e5e4687e60",
+				"method": "DELETE"
+			}
+		]
+	}
+}

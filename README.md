@@ -1,62 +1,33 @@
 # Taller-CRUD
- Implementación de un CRUD para un "Zoo de Mascotas Fantásticas" en Spring Boot 
 
-Ver todas las zonas:
-Invoke-RestMethod -Uri "http://localhost:8080/api/zones" -Method GET
+### Pasos para hacer las pruebas con JMeter
+## Configurar un "Thread Group"
+Define cuantos usuarios virtuales van a enviar solicitudes al endpoint de la API REST
 
-Crear una zona (solo si falta):
-$zoneBody = @{
-  name = "Zona Voladores"
-  description = "Espacio para criaturas magicas"
-  capacity = 10
-} | ConvertTo-Json -Compress
+Se configuraron 10, 50, 100 usuarios simulados que envian solicitudes de creacion de criaturas.
 
-$zone = Invoke-RestMethod -Uri "http://localhost:8080/api/zones" `
--Method POST `
--Headers @{ "Content-Type" = "application/json; charset=utf-8" } `
--Body $zoneBody
+## HTTP Request Defaults
+Protocol: http
+IP: localhost
+Port Number: 8080
 
-$zoneId = $zone.id
-$zone
+## HTTP Request
+POST
+Path: /api/creatures
+Body data:
+{
+  "name": "Dragon Escarlata",
+  "species": "Dragón",
+  "size": 12.5,
+  "dangerLevel": 9,
+  "healthStatus": "Herido"
+}
 
-Nueva criatura valida → se persiste:
-$creatureBody = @{
-  name = "Fenix"
-  species = "Ave magica"
-  size = 2.5
-  dangerLevel = 5
-  healthStatus = "healthy"
-  zone = @{ id = $zoneId }
-} | ConvertTo-Json -Compress -Depth 3
+## HTTP Header Manager
+Content-Type | application/json
 
-$creature = Invoke-RestMethod -Uri "http://localhost:8080/api/creatures" `
--Method POST `
--Headers @{ "Content-Type" = "application/json; charset=utf-8" } `
--Body $creatureBody
+Una vez configurado JMeter, desde la terminal utilizar el comando 
+## mvn spring-boot:run
 
-$creatureId = $creature.id
-$creature
+Y correr JMeter
 
-Obtener lista de todas las criaturas y ver detalles por ID”.
-
-3A. Lista
-Invoke-RestMethod -Uri "http://localhost:8080/api/creatures" -Method GET
-
-3B. Detalle
-Invoke-RestMethod -Uri "http://localhost:8080/api/creatures/3" -Method GET
-
-4. Actualizacion reflejada en BD (campos validos)
-
-$updateBody = @{
-  name = "Fenix Dorado"
-  species = "Ave magica"
-  size = 3.0
-  dangerLevel = 6
-  healthStatus = "healthy"
-  zone = @{ id = 1 }
-} | ConvertTo-Json -Compress -Depth 3
-
-Invoke-RestMethod -Uri "http://localhost:8080/api/creatures/$creatureId" `
--Method PUT `
--Headers @{ "Content-Type" = "application/json; charset=utf-8" } `
--Body $updateBody
